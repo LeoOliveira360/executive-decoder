@@ -58,8 +58,8 @@ export async function POST(req: Request) {
         console.log(`💾 PDF salvo em: ${filePath}`);
       }
       
-      content = await pdfParse(buffer);
-      content = cleanText(content);
+      const pdfResult = await pdfParse(buffer);
+      content = cleanText(pdfResult.text);
     } else {
       return Response.json({ error: 'Este endpoint é apenas para PDF com armazenamento' }, { status: 400 });
     }
