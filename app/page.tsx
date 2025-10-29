@@ -136,9 +136,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* HEADER */}
-      <header className="py-12 px-6 text-center border-b border-gray-800 bg-gray-900 relative">
-        {/* Navigation */}
-        <div className="absolute top-6 right-6">
+      <header className="py-6 px-6 border-b border-gray-800 bg-gray-900">
+        {/* Top bar */}
+        <div className="max-w-7xl mx-auto flex items-center justify-end">
           <Link
             href="/wiki"
             className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg font-semibold transition-all inline-flex items-center gap-2"
@@ -146,7 +146,8 @@ export default function HomePage() {
             📚 Documentação
           </Link>
         </div>
-        <div className="max-w-3xl mx-auto">
+        {/* Title */}
+        <div className="max-w-3xl mx-auto text-center mt-4">
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-100">
             Executive Decoder
           </h1>
