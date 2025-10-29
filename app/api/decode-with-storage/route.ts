@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     
     let content = '';
     let filePath = '';
+  let originalFileName = '';
 
     if (inputType === 'pdf') {
       const file = formData.get('file') as File;
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
         await writeFile(filePath, buffer);
         console.log(`💾 PDF salvo em: ${filePath}`);
       }
+      originalFileName = file.name;
       
       const pdfResult = await pdfParse(buffer);
       content = cleanText(pdfResult.text);
@@ -88,11 +90,11 @@ export async function POST(req: Request) {
 
     const result = completion.choices[0]?.message?.content || 'Erro ao gerar análise';
 
-    return Response.json({
+      return Response.json({
       success: true,
       analysis: result,
       filePath: shouldStore ? filePath : null,
-      fileName: shouldStore ? file.name : null,
+      fileName: shouldStore ? originalFileName : null,
     });
   } catch (error: any) {
     console.error('❌ Erro:', error);
