@@ -1,0 +1,144 @@
+
+
+# Executive Decoder
+
+> Decodifique artigos e documentos em insights executivos acionáveis em segundos. Criado em ~2 horas para demonstrar um fluxo real de “SaaS profissional” com Next.js 14, streaming e Vercel AI SDK.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-38B2AC)
+![Vercel%20AI%20SDK](https://img.shields.io/badge/Vercel%20AI%20SDK-Gemini%2FOpenAI%2FGroq-000)
+![Cheerio](https://img.shields.io/badge/Cheerio-Scraping-ff69b4)
+![React%20Markdown](https://img.shields.io/badge/React%20Markdown-9-61dafb)
+
+## Demonstração
+- Imagens: `docs/screenshot-*.png` (opcional)
+
+## Recursos Principais
+- **Quatro estados de UX claros**: Vazio, Carregando (skeleton), Resultado (Markdown), Erro.
+- **Streaming de resposta**: experiência fluida durante a geração.
+- **App Router (Next.js 14)**: estrutura moderna, rotas `app/api/*` e componentes client.
+- **Markdown profissional**: renderizado via `react-markdown` com hierarquia visual coerente.
+- **Formas de entrada**: Texto, URL (scraping via Cheerio) e PDF.
+
+## Arquitetura e Stack
+- **Frontend**: Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS.
+- **Backend**: rotas serverless em `app/api/decode` com streaming.
+- **AI**: Vercel AI SDK (compatível com Gemini/OpenAI/Groq). O blueprint original define um “Prompt Mestre” e uma estrutura de saída em Markdown (H3, bullets, 💡, ⚡).
+- **Scraping**: Cheerio para parse de HTML.
+- **Renderização**: `react-markdown` para exibir o resultado com fidelidade.
+
+## Estrutura do Projeto
+```
+executive-decoder/
+├── app/
+│   ├── api/
+│   │   └── decode/            # Endpoint de decodificação (streaming)
+│   ├── layout.tsx             # Layout principal
+│   ├── page.tsx               # Página inicial (UX principal)
+│   └── globals.css            # Estilos globais
+├── lib/
+│   └── utils.ts               # Utilitários
+├── package.json               # Dependências
+├── tailwind.config.ts         # Configuração Tailwind
+├── tsconfig.json              # Configuração TypeScript
+└── next.config.js             # Configuração Next.js
+```
+
+## Início Rápido
+1. Clone o repositório
+```bash
+git clone https://github.com/SEU_USUARIO/executive-decoder.git
+cd executive-decoder
+```
+2. Instale dependências
+```bash
+npm install
+```
+3. Defina variáveis de ambiente em `.env.local`
+```env
+# IA (exemplos — use o provedor que estiver no seu backend)
+GROQ_API_KEY="sua-chave-groq"
+# ou
+OPENAI_API_KEY="sua-chave-openai"
+# ou
+GOOGLE_GENERATIVE_AI_API_KEY="sua-chave-gemini"
+```
+4. Rode em desenvolvimento
+```bash
+npm run dev
+```
+5. Abra `http://localhost:3000`
+
+## Deploy
+- **Vercel (recomendado)**: push no Git → Preview/Production automáticos; APIs serverless e streaming funcionam sem ajustes.
+- **Outros**: Firebase Hosting + Cloud Functions/Run requer mais configuração para SSR e streaming.
+
+## Como Usar (Passo a Passo)
+### Básico
+- Cole a URL do artigo → clique em “Alavancar Agora” → copie a análise (botão “Copiar Análise”).
+
+### Intermediário
+- Selecione o método (framework) e a fonte de entrada (Texto/URL/PDF).
+- Para PDF: arraste o arquivo (até ~30 páginas) e envie.
+
+### Avançado
+- Ajuste o “Prompt Mestre” no backend (se aplicável) para personalizar o estilo de saída.
+- Personalize a renderização do Markdown (ex.: classes do Tailwind Typography se desejar).
+
+## Variáveis de Ambiente (Detalhado)
+- `GROQ_API_KEY` ou `OPENAI_API_KEY` ou `GOOGLE_GENERATIVE_AI_API_KEY` dependendo do provedor utilizado no backend.
+- Configure também na plataforma de deploy (ex.: Vercel → Project Settings → Environment Variables).
+
+## Troubleshooting
+- **URL privada ou bloqueada**: tente artigos públicos; bloqueios de paywall impedem scraping.
+- **PDF muito grande**: reduza o tamanho/ páginas; limites variam por ambiente.
+- **Timeouts**: verifique logs da plataforma e aumente limites se possível.
+- **Streaming não aparece**: confirme suporte a streams no ambiente e no navegador.
+- **CORS/Headers**: como o Next.js roda o backend junto, raramente ocorre; se usar domínios distintos, configure CORS.
+
+## FAQ
+- Posso usar outro provedor de IA? Sim, via Vercel AI SDK (OpenAI, Groq, Gemini etc.).
+- Posso trocar o layout? Sim, as mudanças de UX são isoladas na `app/page.tsx`.
+- O scraping quebra? Sites dinâmicos/JS pesado podem exigir fallback (ex.: via APIs de conteúdo ou puppeteer/Playwright).
+- A saída não está no formato esperado? Ajuste o Prompt Mestre e valide os tokens/limites.
+- Preciso de Tailwind Typography? Opcional, mas melhora a leitura do Markdown.
+
+## Roadmap
+- Modo “Comparar duas fontes” (A/B de artigos)
+- Exportação para PDF/Notion
+- Templates de prompts específicos por indústria
+
+## Contribuindo
+- Abra uma issue para discutir mudanças.
+- Faça PRs focados e documentados: descrição clara, motivação e screenshots.
+- Padrão de commits sugerido: `feat:`, `fix:`, `docs:`, `chore:`.
+
+## Licença
+- Este projeto é distribuído sob a licença MIT. Veja `LICENSE` para detalhes.
+
+## Créditos e Agradecimentos
+- Next.js, React, Tailwind CSS, Vercel AI SDK, Cheerio, React Markdown.
+- Criado com apoio de IDEs modernas (ex.: Cursor) e modelos de IA (ex.: Groq, Claude, Gemini) para acelerar o fluxo.
+
+## 👨‍💻 Autor
+Leo Oliveira - Desenvolvedor e Estudioso de IA
+
+Desenvolvido com ❤️ usando as aplicações e serviços citados acima.
+
+## 🚀 Siga para Mais Conteúdo de IA
+Estou criando uma nova aplicação de IA TODO DIA para demonstrar o poder da tecnologia e ajudar empreendedores a aumentar sua produtividade!
+
+- 📱 Novidades diárias sobre ferramentas de IA
+- 💼 Aplicações práticas para aumentar produtividade
+- 🎓 Tutoriais de como implementar IA nos seus projetos
+- 🔥 Dicas e truques para empreendedores
+
+### 🌐 Conecte-se Comigo
+- 🐙 GitHub: github.com/LeoOliveira360
+- 💼 LinkedIn: leonardooliveira360
+- 📸 Instagram: @LeoOliveira360
+- 🌐 WINIIA: www.winiia.com.br
+
+Não deixe de me seguir! Todo dia tem aplicação nova e muita novidade para todos que estão buscando aprender sobre IA, ferramentas de IA para empreendedores e produtividade! 🚀
