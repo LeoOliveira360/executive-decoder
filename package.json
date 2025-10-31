@@ -3,30 +3,33 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-      "dev": "next dev",
-      "build": "next build",
-      "start": "next start",
-      "lint": "next lint"
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
     },
     "dependencies": {
-      "next": "^14.2.0",
-      "react": "^18.3.0",
-      "react-dom": "^18.3.0",
-      "ai": "^3.3.0",
-      "@ai-sdk/openai": "^0.0.54",
-      "groq-sdk": "^0.3.2",
-      "pdf-parse": "^1.1.1",
-      "cheerio": "^1.0.0-rc.12",
-      "react-markdown": "^9.0.1",
-      "typescript": "^5.3.3",
-      "tailwindcss": "^3.4.1",
-      "autoprefixer": "^10.4.17",
-      "postcss": "^8.4.33"
+        "@ai-sdk/openai": "^0.0.54",
+        "@notionhq/client": "^2.3.0",
+        "ai": "^3.3.0",
+        "autoprefixer": "^10.4.17",
+        "cheerio": "^1.0.0-rc.12",
+        "googleapis": "^128.0.0",
+        "groq-sdk": "^0.3.2",
+        "next": "^14.2.0",
+        "pdf-parse": "^1.1.1",
+        "postcss": "^8.4.33",
+        "react": "^18.3.0",
+        "react-dom": "^18.3.0",
+        "react-markdown": "^9.0.1",
+        "tailwindcss": "^3.4.1",
+        "twilio": "^4.23.0",
+        "typescript": "^5.3.3"
     },
     "devDependencies": {
-      "@types/node": "^20.11.5",
-      "@types/react": "^18.2.48",
-      "@types/react-dom": "^18.2.18",
-      "@types/pdf-parse": "^1.1.4"
+        "@types/node": "^20.11.5",
+        "@types/pdf-parse": "^1.1.4",
+        "@types/react": "^18.2.48",
+        "@types/react-dom": "^18.2.18"
     }
-  }
+}
