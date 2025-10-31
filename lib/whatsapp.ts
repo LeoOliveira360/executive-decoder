@@ -1,12 +1,18 @@
 import twilio from 'twilio';
 
 // ============================================================================
-// INICIALIZAR CLIENTE TWILIO
+// TWILIO CLIENT LAZY INIT
 // ============================================================================
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+function getTwilioClient() {
+  const sid = process.env.TWILIO_ACCOUNT_SID || '';
+  const token = process.env.TWILIO_AUTH_TOKEN || '';
+  if (!sid || !token) return null;
+  try {
+    return twilio(sid, token);
+  } catch (_e) {
+    return null;
+  }
+}
 
 // ============================================================================
 // TIPOS
@@ -61,21 +67,16 @@ export async function sendWhatsAppNotification(
   try {
     console.log(`[WhatsApp] Enviando notificação para: ${process.env.TWILIO_WHATSAPP_TO}`);
 
-    // Validar configuração
-    if (!process.env.TWILIO_ACCOUNT_SID) {
-      throw new Error('TWILIO_ACCOUNT_SID não configurado');
+    // Short-circuit opcional
+    if (process.env.WHATSAPP_ENABLED === 'false') {
+      return { success: true, messageSid: 'disabled', status: 'skipped' };
     }
 
-    if (!process.env.TWILIO_AUTH_TOKEN) {
-      throw new Error('TWILIO_AUTH_TOKEN não configurado');
-    }
-
-    if (!process.env.TWILIO_WHATSAPP_FROM) {
-      throw new Error('TWILIO_WHATSAPP_FROM não configurado');
-    }
-
-    if (!process.env.TWILIO_WHATSAPP_TO) {
-      throw new Error('TWILIO_WHATSAPP_TO não configurado');
+    // Validar configuracao e cliente
+    const client = getTwilioClient();
+    if (!client || !process.env.TWILIO_WHATSAPP_FROM || !process.env.TWILIO_WHATSAPP_TO) {
+      console.warn('[WhatsApp] Desabilitado: variaveis ausentes, pulando envio');
+      return { success: true, messageSid: 'disabled', status: 'skipped' };
     }
 
     // Formatar mensagem
