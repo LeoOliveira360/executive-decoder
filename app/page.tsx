@@ -16,6 +16,10 @@ export default function HomePage() {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFramework, setSelectedFramework] = useState<FrameworkType>('hybrid');
   
+  // Flag para (des)ativar o CTA do Gmail via ambiente
+  const gmailDisabled = (process.env.NEXT_PUBLIC_GMAIL_DISABLED === 'true');
+  const [exporting, setExporting] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { completion, isLoading, error, setCompletion, setInput } = useCompletion({
@@ -99,6 +103,65 @@ export default function HomePage() {
     }
   };
 
+  // Handler para exportar análise ao Notion
+  const handleExportToNotion = async () => {
+    try {
+      if (!completion || isLoading) {
+        alert('Nenhuma análise disponível para exportar.');
+        return;
+      }
+
+      setExporting(true);
+
+      // Extrair subject: primeira linha markdown com heading (## ou ###) ou fallback
+      const firstHeading = completion.split('\n').find((l) => /^#{2,3}\s+/.test(l));
+      const subject = firstHeading ? firstHeading.replace(/^#{2,3}\s+/, '').trim().slice(0, 100) : `Análise Manual - ${new Date().toISOString()}`;
+
+      // Mapear tipo da fonte e framework para labels humanizadas
+      const fonteMap: Record<InputType, string> = { text: 'Texto', url: 'URL', pdf: 'PDF' };
+      const frameworkMap: Record<FrameworkType, string> = {
+        hybrid: 'Híbrida',
+        swot: 'SWOT',
+        pestel: 'PESTEL',
+        priorization: 'Priorização',
+        risk: 'Riscos',
+        'business-model': 'Canvas',
+      };
+
+      const body = {
+        subject,
+        content: completion,
+        from: 'Manual',
+        date: new Date().toISOString(),
+        tipoFonte: fonteMap[inputType] as any,
+        framework: frameworkMap[selectedFramework] as any,
+        urlOrigem: inputType === 'url' ? urlInput.trim() : undefined,
+      };
+
+      const res = await fetch('/api/automation/manual-export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Falha ao exportar para o Notion');
+      }
+
+      const data = await res.json();
+      if (data?.notion?.pageUrl) {
+        alert(`Página criada no Notion: ${data.notion.pageUrl}`);
+      } else {
+        alert('Exportação concluída. (Sem URL retornada)');
+      }
+    } catch (e: any) {
+      alert(e.message || 'Erro ao exportar para Notion');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   // Handlers para Drag & Drop
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -139,6 +202,23 @@ export default function HomePage() {
       <header className="py-6 px-6 border-b border-gray-800 bg-gray-900">
         {/* Top bar */}
         <div className="max-w-7xl mx-auto flex items-center justify-end">
+          {gmailDisabled ? (
+            <button
+              type="button"
+              disabled
+              title="Gmail em manutenção — Ainda em desenvolvimento. 2h não bastaram e o Google foi mais lento que a IA no OAuth. Amanhã fica pronto."
+              className="px-4 py-2 mr-3 bg-gray-800 border border-gray-700 text-gray-400 rounded-lg font-semibold transition-all inline-flex items-center gap-2 cursor-not-allowed disabled:opacity-70"
+            >
+              🔒 Conectar Gmail
+            </button>
+          ) : (
+            <a
+              href="/api/oauth/google/init"
+              className="px-4 py-2 mr-3 bg-green-700 hover:bg-green-600 border border-green-600 text-white rounded-lg font-semibold transition-all inline-flex items-center gap-2"
+            >
+              🔐 Conectar Gmail
+            </a>
+          )}
           <Link
             href="/wiki"
             className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg font-semibold transition-all inline-flex items-center gap-2"
@@ -488,6 +568,13 @@ Mínimo: 100 caracteres"
                       className="flex-1 py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all font-semibold"
                     >
                       🔄 Nova Análise
+                    </button>
+                    <button
+                      onClick={handleExportToNotion}
+                      disabled={exporting}
+                      className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all font-semibold"
+                    >
+                      {exporting ? 'Enviando…' : '🧠 Gerar no Notion'}
                     </button>
                   </div>
                 </div>

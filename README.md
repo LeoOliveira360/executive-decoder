@@ -14,6 +14,15 @@
 
 ## Demonstração
 - Imagens: `docs/screenshot-*.png` (opcional)
+ - Documentação de Testes: `docs/TESTING.md`
+ - Roadmap/Novos Recursos: `docs/FEATURES_AND_ROADMAP.md`
+
+## Testing
+
+Para instruções completas de como testar localmente, exportar análises para o Notion e realizar validações de ponta a ponta, consulte:
+
+- [docs/TESTING.md](docs/TESTING.md)
+ - [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md) ← Guia atualizado para criar a Integration e o Database no Notion (inclui prompt para Notion AI)
 
 ## Recursos Principais
 - **Quatro estados de UX claros**: Vazio, Carregando (skeleton), Resultado (Markdown), Erro.
@@ -74,6 +83,76 @@ npm run dev
 ## Deploy
 - **Vercel (recomendado)**: push no Git → Preview/Production automáticos; APIs serverless e streaming funcionam sem ajustes.
 - **Outros**: Firebase Hosting + Cloud Functions/Run requer mais configuração para SSR e streaming.
+
+## Conectar Gmail (OAuth2) — MVP Guiado
+Este fluxo permite que qualquer usuário conecte sua conta Gmail sem expor senha. Você autoriza o app e copia os tokens gerados para configurar o serviço de monitoramento de e‑mail.
+
+### 1) Criar credenciais no Google Cloud
+- Acesse Google Cloud Console → APIs & Services → Credentials.
+- Crie um OAuth consent screen (External ou Internal) e publique (Testing ou In Production).
+- Crie um OAuth Client ID do tipo Web Application.
+  - Adicione em Authorized redirect URIs:
+    - Dev: `http://localhost:3000/api/oauth/google/callback`
+    - Prod: `https://SEU_DOMINIO/api/oauth/google/callback`
+
+### 2) Configurar variáveis no app (Next.js)
+Crie/edite `.env.local` na raiz do projeto:
+```env
+GOOGLE_CLIENT_ID=...      # do OAuth Client
+GOOGLE_CLIENT_SECRET=...  # do OAuth Client
+GOOGLE_REDIRECT_URI=http://localhost:3000/api/oauth/google/callback
+```
+
+### 3) Rodar o app e autorizar
+```bash
+npm install
+npm run dev
+# abra http://localhost:3000
+```
+Clique no botão "Conectar Gmail" (no topo da página). Ao autorizar, você verá um JSON com `access_token`, `refresh_token` etc.
+
+### 4) Aplicar no serviço de monitoramento (email-monitor)
+No diretório `email-monitor/.env`, configure:
+```env
+
+
+
+
+
+GMAIL_USER=seu-email@gmail.com
+GOOGLE_CLIENT_ID=...         # mesmo do app
+GOOGLE_CLIENT_SECRET=...     # mesmo do app
+GOOGLE_REFRESH_TOKEN=...     # copie do callback OAuth (JSON)
+IMAP_HOST=imap.gmail.com
+IMAP_PORT=993
+IMAP_TLS=true
+WEBHOOK_URL=https://SEU_APP/api/automation/webhook
+WEBHOOK_SECRET=chave-secreta
+LOG_LEVEL=info
+NODE_ENV=production
+```
+
+### 5) Registrar escopos
+No Google Cloud, garanta o escopo: `https://mail.google.com/` no consent screen (Sensitive scope). Caso necessário, mantenha em modo Testing e adicione os test users.
+
+### 6) Dicas de produção
+- Redirect URI em produção deve usar HTTPS do seu domínio/Vercel.
+- O endpoint `WEBHOOK_URL` deve ser público e seguro.
+- Guarde `refresh_token` com segurança; o serviço usará ele para obter `access_token` automaticamente.
+
+### 7) Resolver problemas comuns
+- Se não aparecer `refresh_token`, repita o consent (use `prompt=consent`) e verifique o `access_type=offline`.
+- Se a autorização falhar, valide `GOOGLE_REDIRECT_URI` e as URIs cadastradas no OAuth Client.
+- Gmail IMAP precisa estar ativado nas configurações da conta.
+
+### Visualizar a Análise no Notion
+- A visão "Tabela Completa" mostra apenas as propriedades do Database (ex.: Assunto, Status, Prioridade). O conteúdo integral da análise é criado como blocks dentro da página do Notion, não em uma coluna.
+- Para ver a análise completa:
+  1. Clique na linha correspondente no Database `Controle de Emails`.
+  2. Abra a entrada em "Abrir como página".
+  3. Você verá o heading "🔑 Análise Completa" seguido das seções (headings, listas, quotes e divisores) preservadas.
+- Os itens de ação são adicionados como `to_do` blocks dentro da mesma página (por opção de design), não como páginas separadas do Kanban.
+- Em reenvios da mesma análise, a página existente é atualizada com uma seção "🔁 Atualização de Análise" e a data em `Última Atualização`.
 
 ## Como Usar (Passo a Passo)
 ### Básico
